@@ -17,7 +17,7 @@ limiter = Limiter(
     app=app,
     default_limits=[],          # แก้จาก defult เป็น default
     storage_uri="memory://",    # แก้จาก storage-uri== เป็น storage_uri=
-    header_enabled=True
+    headers_enabled=True
 )
 
 WORK_FACTOR = 2_000 
