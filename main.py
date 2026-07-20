@@ -17,9 +17,8 @@ limiter = Limiter(
     app=app,
     defult_limits=[],
     storage-uri=="memory://",
-    header_enabled=True
-)
-#
+    header_enabled=True)
+
 WORK_FACTOR = 2_000_000 ##---------##
 PASSWORD_LENGTH = 10
 SALT_SIZE_BYTES = 16
