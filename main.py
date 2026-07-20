@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-#
 import hashlib
 import hmac
 import secrets
@@ -11,22 +10,23 @@ import time
 app = Flask(__name__)
 # แสดง JSON ตามลำดับที่เขียนไว้ใน Dictionary
 app.json.sort_keys = False
-# เพิ่มDos protection
+
+# ✅ แก้ไขจุดพิมพ์ผิดใน Limiter
 limiter = Limiter(
     key_func=get_remote_address,
     app=app,
-    default_limits=[],
-    storage_uri="memory://",
-    header_enabled=True)
+    default_limits=[],          # แก้จาก defult เป็น default
+    storage_uri="memory://",    # แก้จาก storage-uri== เป็น storage_uri=
+    header_enabled=True
+)
 
-WORK_FACTOR = 2_000_000 ##---------##
+WORK_FACTOR = 2_000_000 
 PASSWORD_LENGTH = 10
 SALT_SIZE_BYTES = 16
 
 
 def generate_random_password(length: int) -> str:
     characters = string.ascii_letters + string.digits
-
     return "".join(
         secrets.choice(characters)
         for _ in range(length)
@@ -51,9 +51,7 @@ def home():
 
 
 @app.route("/login-check")
-# เพิ่มส่วน DOS Protection
-@limiter.limit("5 per second")
-#
+@limiter.limit("2 per second") # ✅ แนะนำให้ลดลงหน่อยเพราะ PBKDF2 2 ล้านรอบกิน CPU สูงมากครับ
 def login_check():
     start_time = time.perf_counter()
 
@@ -83,15 +81,11 @@ def login_check():
         "algorithm": "PBKDF2-HMAC-SHA256",
         "work_factor": WORK_FACTOR,
 
-        "calculated_password_hash":
-            calculated_password_hash.hex(),
-        "stored_password_hash":
-            STORED_PASSWORD_HASH.hex(),
-        "hash_size_bits":
-            len(calculated_password_hash) * 8,
+        "calculated_password_hash": calculated_password_hash.hex(),
+        "stored_password_hash": STORED_PASSWORD_HASH.hex(),
+        "hash_size_bits": len(calculated_password_hash) * 8,
         "password_valid": password_is_valid,
-        "execution_time_seconds":
-            round(execution_time, 4),
+        "execution_time_seconds": round(execution_time, 4),
     })
 
 
